@@ -34,7 +34,7 @@ namespace Asteroids.Model
             objectDestroyModel = new ObserverObjectDestroy(objectsSpawner.allMoveObjects);
             objectDestroyModel.OnObjectDestroy += OnObjectDestroy;
 
-            lazerCollisionLogic = new LazerCollisionLogic(camera, objectDestroyModel);
+            lazerCollisionLogic = new LazerCollisionLogic(camera, objectsSpawner, objectDestroyModel);
             lazerCollisionLogic.OnBulletCreate += OnObjectSpawn;
             lazerCollisionLogic.OnBulletDestroy += OnObjectDestroy;
 

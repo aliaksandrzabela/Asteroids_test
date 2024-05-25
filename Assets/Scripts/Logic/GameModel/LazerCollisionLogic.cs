@@ -12,11 +12,13 @@ namespace Asteroids.Model
 
         private readonly List<BulletLazer> bullets = new();
         private readonly Camera camera;
+        private readonly ObjectsSpawner objectsSpawner;
         private readonly ObserverObjectDestroy observerObjectDestroy;
 
-        public LazerCollisionLogic(Camera camera, ObserverObjectDestroy observerObjectDestroy)
-        {
+        public LazerCollisionLogic(Camera camera, ObjectsSpawner objectsSpawner, ObserverObjectDestroy observerObjectDestroy)
+        {            
             this.camera = camera;
+            this.objectsSpawner = objectsSpawner;
             this.observerObjectDestroy = observerObjectDestroy;
             observerObjectDestroy.OnObjectDestroy += OnObjectDestroy;
         }
@@ -57,6 +59,14 @@ namespace Asteroids.Model
             var collisions = GetCollisions();
             foreach (var model in collisions)
             {
+                if(model is AsteroidModel)
+                {
+                    var asteroid = model as AsteroidModel;
+                    if (asteroid.Size >= Config.ASTEROID_SIZE)
+                    {
+                        objectsSpawner.CreateAsteroidParts(asteroid.Position);
+                    }
+                }
                 observerObjectDestroy.ModelDestroy(model);
             }
         }
