@@ -16,16 +16,16 @@ namespace Asteroids.Model
         public const float ASTEROID_PART_SPEED = 0.15f;
 
         public const float SHIP_ACCELERATION = 0.35f;
-        public const float SHIP_SIZE = 0.007f;
+        public const float SHIP_SIZE = 0.008f;
         public const float SHIP_ROTATION_SPEED = 180f;
         public const float BULLET_LAZER_LIFETIME = 0.5f;
 
         public const int LAZER_SHOOT_COUNT = 10;
         public const float LAZER_COOLDOWN = 4.5f;
 
-        public const float UFO_SIZE = 0.007f;
-        public const float UFO_ACCELERATION = 0.29f;
-        public const float MAX_MOVE_SPEED = 0.5f;
+        public const float UFO_SIZE = 0.008f;
+        public const float UFO_ACCELERATION = 0.36f;
+        public const float MAX_MOVE_SPEED = 0.4f;
 
         public const string TAG_ASTEROID = "asteroid";
         public const string TAG_UFO = "ufo";

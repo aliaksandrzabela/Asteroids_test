@@ -1,0 +1,18 @@
+{
+    "name": "AsteroidsView",
+    "rootNamespace": "Asteroids.View",
+    "references": [
+        "GUID:c4baa248ca8d1754c9330d09f395a1a6",
+        "GUID:29b91e7b5dad4c64b92ce40651076ee4",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

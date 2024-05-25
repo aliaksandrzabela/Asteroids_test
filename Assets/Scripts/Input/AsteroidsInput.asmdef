@@ -1,0 +1,17 @@
+{
+    "name": "AsteroidsInput",
+    "rootNamespace": "Asteroids.Input",
+    "references": [
+        "GUID:c4baa248ca8d1754c9330d09f395a1a6",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
