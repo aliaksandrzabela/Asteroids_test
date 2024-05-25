@@ -1,11 +1,14 @@
 using UnityEngine;
 
-public class BulletLazer : Bullet
+namespace Asteroids.Model
 {
-    public readonly Vector2 Direction;
-
-    public BulletLazer(Vector2 position, Vector2 direction) : base(position)
+    public class BulletLazer : Bullet
     {
-        Direction = direction;
+        public readonly Vector2 Direction;
+
+        public BulletLazer(Vector2 position, Vector2 direction, ObserverObjectDestroy observerObjectDestroy, float livetime) : base(position, observerObjectDestroy, livetime)
+        {
+            Direction = direction;
+        }
     }
 }

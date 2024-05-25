@@ -1,28 +1,35 @@
+using Asteroids.Model;
+using Asteroids.Model.View;
 using UnityEngine;
 
-public class MoveObjectView : AbstractModelView
+namespace Asteroids.View
 {
-    private IMoveObject model;
-    private Camera objCamera;
-
-    void Update()
+    public class MoveObjectView : AbstractModelView
     {
-        transform.position = objCamera.ViewportToWorldPoint(GetViewportPosition());
-        transform.rotation = Quaternion.Euler(0, 0, model.Angle);
-    }
+        public override object Model => model;
 
-    public override void Init(Camera camera, object model)
-    {
-        objCamera = camera;
-        this.model = model as IMoveObject;
-        if (model == null)
+        private IMoveObject model;
+        private Camera objCamera;
+
+        void Update()
         {
-            Debug.LogError("Wrong model. For MoveObjectView.");
+            transform.position = objCamera.ViewportToWorldPoint(GetViewportPosition());
+            transform.rotation = Quaternion.Euler(0, 0, model.Angle);
         }
-    }
 
-    private Vector3 GetViewportPosition()
-    {
-        return new Vector3(model.Position.x, model.Position.y, 1);
+        public override void Init(Camera camera, object model)
+        {
+            objCamera = camera;
+            this.model = model as IMoveObject;
+            if (model == null)
+            {
+                Debug.LogError("Wrong model. For MoveObjectView.");
+            }
+        }
+
+        private Vector3 GetViewportPosition()
+        {
+            return new Vector3(model.Position.x, model.Position.y, 1);
+        }
     }
 }

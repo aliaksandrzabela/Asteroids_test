@@ -1,45 +1,36 @@
 using System.Collections.Generic;
+using UnityEngine;
 
-public class ColisionCheck
+namespace Asteroids.Model
 {
-    private readonly List<IMoveObject> moveObjects;
-
-    public ColisionCheck(List<IMoveObject> moveObjects)
+    public class ColisionCheck
     {
-        this.moveObjects = moveObjects;
-    }
+        private readonly List<IMoveObject> moveObjects;
 
-    public List<(object, object)> CheckCollisions()
-    {
-        List<(object, object)> result = new();
-
-        for (int i = 0; i < moveObjects.Count; i++)
+        public ColisionCheck(List<IMoveObject> moveObjects)
         {
-            for (int j = 0; j < moveObjects.Count; j++)
+            this.moveObjects = moveObjects;
+        }
+
+        public IEnumerable<(object, object)> CheckCollisions()
+        {
+            List<(object, object)> result = new();
+
+            for (int i = 0; i < moveObjects.Count; i++)
             {
-                if (i == j) continue;
-                if ((moveObjects[i].Position - moveObjects[j].Position).magnitude < moveObjects[i].Size + moveObjects[j].Size)
+                for (int j = 0; j < moveObjects.Count; j++)
                 {
-                    if (!Contains(result, (moveObjects[i], moveObjects[j])))
+                    if (i == j) continue;
+                    if ((moveObjects[i].Position - moveObjects[j].Position).magnitude < moveObjects[i].Size + moveObjects[j].Size)
                     {
-                        result.Add((moveObjects[i], moveObjects[j]));
-                    }                   
+                        if (!result.ContainsPair((moveObjects[i], moveObjects[j])))
+                        {
+                            result.Add((moveObjects[i], moveObjects[j]));
+                        }
+                    }
                 }
             }
+            return result;
         }
-        return result;
-    }
-
-    private bool Contains(List<(object, object)> pairs, (object, object) pair)
-    {
-        foreach (var (left, right) in pairs)
-        {
-            if (left == pair.Item1 && right == pair.Item2)
-                return true;
-
-            if (left == pair.Item2 && right == pair.Item1)
-                return true;
-        }
-        return false;
     }
 }

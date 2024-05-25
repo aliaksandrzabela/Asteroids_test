@@ -1,52 +1,59 @@
 using System;
 using System.Collections.Generic;
 
-public class CollisionObjectLogic
+namespace Asteroids.Model
 {
-    public event Action OnShipCollide;
-    public event Action<object> OnObjectDestroy;
-
-    private readonly ColisionCheck colisionCheckModel;
-    private readonly List<IMoveObject> moveObjects;
-    private readonly ObjectsSpawner objectsSpawner;
-
-    public CollisionObjectLogic(ObjectsSpawner objectsSpawner)
+    public class CollisionObjectLogic
     {
-        this.moveObjects = objectsSpawner.AllSpawned;
-        this.objectsSpawner = objectsSpawner;
-        colisionCheckModel = new ColisionCheck(moveObjects);
-    }
+        public event Action OnShipCollide;
 
-    public void ProcessCollisions()
-    {
-        var objectsPair = colisionCheckModel.CheckCollisions();
-        foreach(var pair in objectsPair)
+        private readonly ColisionCheck colisionCheckModel;
+        private readonly List<IMoveObject> moveObjects;
+        private readonly ObjectsSpawner objectsSpawner;
+        private readonly ObserverObjectDestroy observerObjectDestroy;
+
+        public CollisionObjectLogic(ObjectsSpawner objectsSpawner, ObserverObjectDestroy observerObjectDestroy)
         {
-            if(pair.Item1 is ShipModel)
-            {
-                if (pair.Item2 is ShipUFOModel || pair.Item2 is AsteroidModel)
-                {
-                    OnShipCollide?.Invoke();
-                }
-            }
+            this.moveObjects = objectsSpawner.allMoveObjects;
+            this.objectsSpawner = objectsSpawner;
+            this.observerObjectDestroy = observerObjectDestroy;
+            colisionCheckModel = new ColisionCheck(moveObjects);
+        }
 
-            if(pair.Item1 is Bullet && !(pair.Item2 is ShipModel) && !(pair.Item2 is Bullet))
+        public void ProcessCollisions()
+        {
+            var collisions = colisionCheckModel.CheckCollisions();
+            foreach (var pair in collisions)
             {
-                if(pair.Item2 is AsteroidModel)
+                if (pair.Item1 is ShipModel)
                 {
-                    var asteroid = pair.Item2 as AsteroidModel;
-                    if(asteroid.Size >= Config.ASTEROID_SIZE)
+                    if (pair.Item2 is ShipUFOModel || pair.Item2 is AsteroidModel)
                     {
-                        objectsSpawner.CreateAsteroidParts(asteroid.Position);
+                        OnShipCollide?.Invoke();
                     }
                 }
 
-                moveObjects.Remove(pair.Item1 as IMoveObject);
-                moveObjects.Remove(pair.Item2 as IMoveObject);
+                if (pair.Item1 is Bullet || pair.Item2 is Bullet)
+                {
+                    object other = (pair.Item1 is Bullet) ? pair.Item2 : pair.Item1;
+                    if (other is ShipModel || other is Bullet)
+                    {
+                        continue;
+                    }
 
-                OnObjectDestroy?.Invoke(pair.Item1);
-                OnObjectDestroy?.Invoke(pair.Item2);
+                    if (other is AsteroidModel)
+                    {
+                        var asteroid = other as AsteroidModel;
+                        if (asteroid.Size >= Config.ASTEROID_SIZE)
+                        {
+                            objectsSpawner.CreateAsteroidParts(asteroid.Position);
+                        }
+                    }
+                    observerObjectDestroy.ModelDestroy(pair.Item1);
+                    observerObjectDestroy.ModelDestroy(pair.Item2);
+                }
             }
         }
     }
+
 }

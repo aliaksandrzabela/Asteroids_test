@@ -1,12 +1,15 @@
-using System;
 using UnityEngine;
 
-public abstract class WeaponModel
+namespace Asteroids.Model
 {
-    public virtual void Shoot(Vector2 position, Vector2 direction)
+    public abstract class WeaponModel
     {
-        CreateBullet(position, direction);        
-    }
+        public virtual void Shoot(Vector2 position, Vector2 direction)
+        {
+            CreateBullet(position, direction);
+        }
 
-    protected abstract Bullet CreateBullet(Vector2 position, Vector2 direction);
+        protected abstract Bullet CreateBullet(Vector2 position, Vector2 direction);
+    }
 }
+

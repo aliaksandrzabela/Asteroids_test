@@ -1,58 +1,86 @@
 using System;
 using UnityEngine;
 
-public class GameModel
+namespace Asteroids.Model
 {
-    public event Action<object> OnModelCreated;
-    public event Action<object> OnModelDestroy;
-    public event Action OnGameOver;
-    public ShipModel Player => player;
-    public WeaponLazerModel PlayerLazer => lazer;
-
-    private readonly ObjectsSpawner objectsSpawner;
-    private readonly MoveObjectsModel moveObjectsModel;    
-    private readonly CollisionObjectLogic collisionObjectLogic;
-    private readonly LazerCollisionLogic lazerCollisionLogic;
-    private readonly ShipModel player;
-    private readonly WeaponLazerModel lazer;    
-
-    private Vector2 playerStartPosition = Vector2.one / 2f;
-
-    public GameModel()
+    public class GameModel
     {
-        player = new ShipModel(playerStartPosition, Config.SHIP_SIZE, Config.SHIP_ROTATION_SPEED, Config.SHIP_ACCELERATION);
-        objectsSpawner = new ObjectsSpawner(player, Config.LEVEL_TIME, Config.ASTEROIDS_ON_LEVEL);
-        objectsSpawner.OnObjectSpawn += OnObjectSpawn;
+        public event Action<object> OnModelCreated;
+        public event Action<object> OnModelDestroy;
+        public event Action OnGameOver;
+        public ShipModel Player => player;
+        public int Score => scoreModel.Score;
+        public WeaponLazerModel PlayerLazer => lazer;
+        private readonly ObjectsSpawner objectsSpawner;
+        private readonly BordersCheckModel bordersCheckModel;
+        private readonly CollisionObjectLogic collisionObjectLogic;
+        private readonly LazerCollisionLogic lazerCollisionLogic;
+        private readonly UpdateObjectsModel updateObjectsModel;
+        private readonly ObserverObjectDestroy objectDestroyModel;
+        private readonly WeaponLazerModel lazer;
+        private readonly ShipModel player;
+        private readonly ScoreModel scoreModel;
 
-        var gun = new WeaponGunModel(objectsSpawner);
-        lazer = new WeaponLazerModel(Config.LAZER_SHOOT_COUNT, Config.LAZER_COOLDOWN);
-        player.InitWeapons(gun, lazer);
+        private Vector2 playerStartPosition = Vector2.one / 2f;
+        private bool isGameOver = false;
 
-        moveObjectsModel = new MoveObjectsModel(objectsSpawner.AllSpawned);
-        collisionObjectLogic = new CollisionObjectLogic(objectsSpawner);
-        collisionObjectLogic.OnObjectDestroy += OnObjectDestroy;
-        collisionObjectLogic.OnShipCollide += OnShipCollide;
-    }
+        public GameModel(Camera camera)
+        {
+            player = new ShipModel(playerStartPosition, Config.SHIP_SIZE, Config.SHIP_ROTATION_SPEED, Config.SHIP_ACCELERATION);
 
-    public void Update(float deltaTime)
-    {
-        objectsSpawner.Update(deltaTime);
-        moveObjectsModel.Update(deltaTime);
-        collisionObjectLogic.ProcessCollisions();
-    }
+            objectsSpawner = new ObjectsSpawner(player, Config.LEVEL_TIME, Config.ASTEROIDS_ON_LEVEL);
+            objectsSpawner.OnObjectSpawn += OnObjectSpawn;
 
-    private void OnObjectSpawn(IMoveObject model)
-    {
-        OnModelCreated?.Invoke(model);
-    }
+            objectDestroyModel = new ObserverObjectDestroy(objectsSpawner.allMoveObjects);
+            objectDestroyModel.OnObjectDestroy += OnObjectDestroy;
 
-    private void OnObjectDestroy(object model)
-    {
-        OnModelDestroy?.Invoke(model);
-    }
+            lazerCollisionLogic = new LazerCollisionLogic(camera, objectDestroyModel);
+            lazerCollisionLogic.OnBulletCreate += OnObjectSpawn;
+            lazerCollisionLogic.OnBulletDestroy += OnObjectDestroy;
 
-    private void OnShipCollide()
-    {
-        OnGameOver?.Invoke();
+            var gun = new WeaponGunModel(objectsSpawner, objectDestroyModel);
+            lazer = new WeaponLazerModel(Config.LAZER_SHOOT_COUNT, Config.LAZER_COOLDOWN, lazerCollisionLogic, objectDestroyModel);
+            player.InitWeapons(gun, lazer);
+
+            bordersCheckModel = new BordersCheckModel(objectsSpawner.allMoveObjects);
+
+            collisionObjectLogic = new CollisionObjectLogic(objectsSpawner, objectDestroyModel);
+            collisionObjectLogic.OnShipCollide += OnShipCollide;
+
+            updateObjectsModel = new UpdateObjectsModel(new IObjectSpawn[] { objectsSpawner, lazer }, objectDestroyModel);
+            updateObjectsModel.Add(lazer);
+            scoreModel = new();
+        }
+
+        public void Update(float deltaTime)
+        {
+            if (isGameOver)
+            {
+                return;
+            }
+            objectsSpawner.Update(deltaTime);
+            bordersCheckModel.Update(deltaTime);
+            collisionObjectLogic.ProcessCollisions();
+            updateObjectsModel.Update(deltaTime);
+            lazerCollisionLogic.ProcessCollisions();
+        }
+
+        private void OnObjectSpawn(object model)
+        {
+            OnModelCreated?.Invoke(model);
+        }
+
+        private void OnObjectDestroy(object model)
+        {
+            scoreModel.AddScore(model);
+            OnModelDestroy?.Invoke(model);
+        }
+
+        private void OnShipCollide()
+        {
+            isGameOver = true;
+            OnGameOver?.Invoke();
+        }
     }
 }
+

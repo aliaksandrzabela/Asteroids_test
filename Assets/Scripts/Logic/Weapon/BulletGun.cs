@@ -1,18 +1,20 @@
 using UnityEngine;
 
-public class BulletGun : Bullet, IMoveObject
+namespace Asteroids.Model
 {
-    public float Size => size;
-    public Vector2 Velocity { get; set; }
-
-    public float Angle { get; set; }
-
-
-    private readonly float size;
-
-    public BulletGun(Vector2 position, Vector2 direction, float speed, float size) : base (position)
+    public class BulletGun : Bullet, IMoveObject
     {
-        Velocity = direction * speed;
-        this.size = size;
-    }    
+        public float Size => size;
+        public Vector2 Velocity { get; set; }
+
+        public float Angle { get; set; }
+
+        private readonly float size;
+
+        public BulletGun(Vector2 position, Vector2 direction, float speed, float size, float livetime, ObserverObjectDestroy observerObjectDestroy) : base(position, observerObjectDestroy, livetime)
+        {
+            Velocity = direction * speed;
+            this.size = size;
+        }
+    }
 }

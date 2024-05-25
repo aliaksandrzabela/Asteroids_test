@@ -1,21 +1,24 @@
 using UnityEngine;
 
-public class AsteroidModel : IMoveObject
+namespace Asteroids.Model
 {
-    public float Size => size;
-
-    public Vector2 Position { get; set; }
-    public Vector2 Velocity { get; set; }
-
-    public float Angle { get; set; }
-
-    private readonly float size;
-
-    public AsteroidModel(Vector2 position, Vector2 velocity, float size)
+    public class AsteroidModel : IMoveObject
     {
-        Position = position;
-        Velocity = velocity;
+        public float Size => size;
 
-        this.size = size;
+        public Vector2 Position { get; set; }
+        public Vector2 Velocity { get; set; }
+
+        public float Angle { get; set; }
+
+        private readonly float size;
+
+        public AsteroidModel(Vector2 position, Vector2 velocity, float size)
+        {
+            Position = position;
+            Velocity = velocity;
+
+            this.size = size;
+        }
     }
 }
